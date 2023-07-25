@@ -31,7 +31,7 @@ public class PlanetCrudService {
     }
 
     public void deletePlanet(String id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();;
+        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         Planet planet = session.get(Planet.class, id);
         session.remove(planet);

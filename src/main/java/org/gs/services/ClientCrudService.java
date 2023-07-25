@@ -31,7 +31,7 @@ public class ClientCrudService {
     }
 
     public void deleteClient(long id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();;
+        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         Client client = session.get(Client.class, id);
         session.remove(client);
