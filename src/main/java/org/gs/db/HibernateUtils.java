@@ -3,7 +3,6 @@ package org.gs.db;
 import org.flywaydb.core.Flyway;
 import org.gs.entity.Client;
 import org.gs.entity.Planet;
-import org.gs.entity.Ticket;
 import org.gs.props.PropertiesUtil;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -17,7 +16,6 @@ public class HibernateUtils {
         sessionFactory = new Configuration()
                 .addAnnotatedClass(Client.class)
                 .addAnnotatedClass(Planet.class)
-                .addAnnotatedClass(Ticket.class)
                 .buildSessionFactory();
 
         flywayMigration(PropertiesUtil.getPropertyValue(DB_URL_KEY));
