@@ -11,6 +11,8 @@ public class HibernateUtils {
     private static final HibernateUtils INSTANCE = new HibernateUtils();
     private final SessionFactory sessionFactory;
     private static final String DB_URL_KEY = "hibernate.connection.url";
+    private static final String DB_USER_KEY = "hibernate.connection.username";
+    private static final String DB_PASSWORD_KEY = "hibernate.connection.password";
 
     private HibernateUtils() {
         sessionFactory = new Configuration()
@@ -18,7 +20,11 @@ public class HibernateUtils {
                 .addAnnotatedClass(Planet.class)
                 .buildSessionFactory();
 
-        flywayMigration(PropertiesUtil.getPropertyValue(DB_URL_KEY));
+        flywayMigration(
+                PropertiesUtil.getPropertyValue(DB_URL_KEY),
+                PropertiesUtil.getPropertyValue(DB_USER_KEY),
+                PropertiesUtil.getPropertyValue(DB_PASSWORD_KEY)
+        );
     }
 
     public static HibernateUtils getInstance() {
@@ -32,8 +38,8 @@ public class HibernateUtils {
         sessionFactory.close();
     }
 
-    private void flywayMigration(String dbConnectionUrl) {
-        Flyway flyway = Flyway.configure().dataSource(dbConnectionUrl, null, null).load();
+    private void flywayMigration(String dbConnectionUrl, String username, String password) {
+        Flyway flyway = Flyway.configure().dataSource(dbConnectionUrl, username, password).load();
         flyway.migrate();
     }
 }

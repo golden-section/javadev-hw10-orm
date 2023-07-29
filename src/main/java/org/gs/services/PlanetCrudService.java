@@ -8,41 +8,60 @@ import java.util.List;
 
 public class PlanetCrudService {
     public void createPlanet(Planet planet) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        session.persist(planet);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(planet);
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public Planet getPlanetById(String id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Planet planet = session.get(Planet.class, id);
-        session.close();
-        return planet;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            return session.get(Planet.class, id);
+        }
     }
 
     public void updatePlanet(Planet planet) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        session.merge(planet);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(planet);
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public void deletePlanet(String id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Planet planet = session.get(Planet.class, id);
-        session.remove(planet);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Planet planet = session.get(Planet.class, id);
+            if(planet !=null) {
+                session.remove(planet);
+                System.out.println("The planet with id [" + id + "] has been deleted");
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public List<Planet> getAllPlanets() {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        List<Planet> allPlanets = session.createQuery("FROM Planet", Planet.class).list();
-        session.close();
-        return allPlanets;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            return session.createQuery("FROM Planet", Planet.class).list();
+        }
     }
 }

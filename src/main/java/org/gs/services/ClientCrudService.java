@@ -8,41 +8,60 @@ import java.util.List;
 
 public class ClientCrudService {
     public void createClient(Client client) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        session.persist(client);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(client);
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public Client getClientById(long id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Client client = session.get(Client.class, id);
-        session.close();
-        return client;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            return session.get(Client.class, id);
+        }
     }
 
     public void updateClient(Client client) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        session.merge(client);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(session.merge(client));
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public void deleteClient(long id) {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Client client = session.get(Client.class, id);
-        session.remove(client);
-        transaction.commit();
-        session.close();
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            Client client = session.get(Client.class, id);
+            if(client != null) {
+                session.remove(client);
+                System.out.println("The client with id [" + id + "] has been deleted");
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
     }
 
     public List<Client> getAllClients() {
-        Session session = HibernateUtils.getInstance().getSessionFactory().openSession();
-        List<Client> allClients = session.createQuery("FROM Client", Client.class).list();
-        session.close();
-        return allClients;
+        try(Session session = HibernateUtils.getInstance().getSessionFactory().openSession()) {
+            return session.createQuery("FROM Client", Client.class).list();
+        }
     }
 }
